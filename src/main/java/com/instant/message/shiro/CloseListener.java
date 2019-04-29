@@ -11,7 +11,6 @@ public class CloseListener implements ApplicationListener<ContextClosedEvent> {
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
         logger.info("程序停止");
-        SecurityUtils.getSecurityManager().logout(SecurityUtils.getSubject());
 
     }
 }

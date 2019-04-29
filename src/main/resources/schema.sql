@@ -2,7 +2,7 @@ CREATE TABLE `user`(
 id int(20) not null primary key AUTO_INCREMENT,
 name char(20),
 password char(64) default '123456',
-signature char(64),
+signature char(200),
 group_id int(20)
 );
 CREATE TABLE `group`(

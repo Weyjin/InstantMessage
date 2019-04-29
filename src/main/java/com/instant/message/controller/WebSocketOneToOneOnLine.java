@@ -5,6 +5,7 @@ import com.instant.message.config.ApplicationHelper;
 import com.instant.message.entity.OneToOneMessage;
 import com.instant.message.entity.Result;
 import com.instant.message.service.UserService;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -18,19 +19,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint("/websocket/OneToOne/{socketId}/{userId}")
 public class WebSocketOneToOneOnLine {
 
-    private UserService userService= (UserService) ApplicationHelper.getBean("userService");
     private static int onlineCount;
     private static Map<String, WebSocketOneToOneOnLine> connections = new ConcurrentHashMap<>();
 
     private Session session;
     private String id;
     private String socketId;
-    /**
-     * 连接建立成功调用的方法
-     *
-     * @param session
-     *            可选的参数。session为与某个客户端的连接会话，需要通过它来给客户端发送数据
-     */
+
     @OnOpen
     public void onOpen(Session session, @PathParam("socketId") String socketId,@PathParam("userId") String userId) {
         this.session = session;
@@ -72,7 +67,9 @@ public class WebSocketOneToOneOnLine {
 
         try {
             int userId=Integer.parseInt(id);
-             Result user=userService.selectByPrimaryKeyToMessage(userId);
+            UserService userService= (UserService) ApplicationHelper.getBean("userService");
+
+            Result user=userService.selectByPrimaryKeyToMessage(userId);
              m.setUser(user);
             sendMessage(socketId,m.getToUserId(),m);
         } catch (IOException e) {

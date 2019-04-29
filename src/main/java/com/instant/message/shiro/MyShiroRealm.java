@@ -1,5 +1,6 @@
 package com.instant.message.shiro;
 
+import com.instant.message.config.ApplicationHelper;
 import com.instant.message.entity.User;
 import com.instant.message.service.UserService;
 import org.apache.shiro.authc.*;
@@ -20,8 +21,6 @@ import java.util.Map;
  */
 public class MyShiroRealm extends AuthorizingRealm {
 
-    @Autowired
-    private UserService userService;
     /**
      * 登录后授权
      * @param pc
@@ -82,6 +81,7 @@ public class MyShiroRealm extends AuthorizingRealm {
 
         Map<String,Object> map=new HashMap<>();
         map.put("name",username);
+         UserService userService= (UserService) ApplicationHelper.getBean("userService");
         User user=userService.selectByOnly(map);
         if(user!=null){
             String password= user.getPassword();

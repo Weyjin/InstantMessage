@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @MapperScan(basePackages = "com.instant.message.dao")
-@ComponentScan("com.instant.message.*")
+@ComponentScan("com.instant.message.*") // 组件扫描
 public class MessageApplication {
 
     public static void main(String[] args) {

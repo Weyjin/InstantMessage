@@ -5,6 +5,7 @@ import com.instant.message.config.ApplicationHelper;
 import com.instant.message.entity.OneToOneMessage;
 import com.instant.message.entity.Result;
 import com.instant.message.service.UserService;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -18,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @ServerEndpoint("/websocket/OneToMultiple/{socketId}/{userId}")
 public class WebSocketOneToMultipleOnLine {
 
-    private UserService userService= (UserService) ApplicationHelper.getBean("userService");
     private static int onlineCount;
     private static Map<String, Set<WebSocketOneToMultipleOnLine>> connections = new ConcurrentHashMap<>();
 
@@ -86,7 +86,9 @@ public class WebSocketOneToMultipleOnLine {
 
         try {
             int userId=Integer.parseInt(id);
-             Result user=userService.selectByPrimaryKeyToMessage(userId);
+            UserService userService= (UserService) ApplicationHelper.getBean("userService");
+
+            Result user=userService.selectByPrimaryKeyToMessage(userId);
              m.setUser(user);
             sendMessage(socketId,m.getCurrentUserId(),m);
         } catch (IOException e) {
