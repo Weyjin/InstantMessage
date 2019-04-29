@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+
+    <script th:src="@{/js/jquery-3.2.1.min.js}"></script>
+    <script th:src="@{/js/jquery.tabs.js}"></script>
+    <script th:src="@{/js/jquery.expanded.js}"></script>
+    <script th:src="@{/js/jquery.dialog.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/AdminLTE.min.css}">
+    <link rel="stylesheet" th:href="@{/css/tabs.css}">
+    <link rel="stylesheet" th:href="@{/css/expanded.css}">
+    <link rel="stylesheet" th:href="@{/css/dialog.css}">
+    <style>
+        .tab__lines + .tab__panel {
+            padding-top: 0px;
+
+        }
+        .tab__content{
+            margin-bottom: 45px;
+        }
+        .navbar{
+            bottom:0;
+            top: auto;
+            margin-bottom: 0px;
+        }
+
+        .tab__lines {
+            margin-top: 0px;
+            background:#eee;
+            bottom: 45px;
+
+
+        }
+        .tab__line{
+            background:transparent;
+        }
+
+        .navbar__item{
+            font-weight:bold;
+            background-color:#fff;
+            color:#eee;
+            margin: auto;
+            padding: 0px 0;
+
+        }
+        .arrow{
+            color:#9e9e9e;
+        }
+        .col-md-12{
+            padding-right: 0px;
+             padding-left: 0px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="tab" id="tab">
+    <div class="navbar">
+        <div class="navbar__item">群聊</div>
+        <div class="navbar__item">联系人</div>
+        <div class="navbar__item">主页</div>
+
+    </div>
+    <div class="tab__lines">
+        <div class="tab__line"></div>
+    </div>
+    <div class="tab__panel">
+        <div class="tab__content">
+            <div class="col-md-12">
+                <!-- Widget: user widget style 1 -->
+                <div class="box box-widget widget-user-2">
+                    <!-- Add the bg color to the header using any of the bg-* classes -->
+
+                    <div class="box-footer no-padding">
+                        <ul class="nav nav-stacked" id="messageList">
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.widget-user -->
+            </div>
+        </div>
+        <div class="tab__content">
+            <div class="example"></div>
+        </div>
+        <div class="tab__content">
+
+            <!-- Widget: user widget style 1 -->
+            <div class="box box-widget widget-user-2">
+                <!-- Add the bg color to the header using any of the bg-* classes -->
+                <div class="widget-user-header bg-teal">
+                    <div class="widget-user-image">
+                        <img class="img-circle" src="images/user-default.jpeg" alt="User Avatar">
+                    </div>
+                    <!-- /.widget-user-image -->
+                    <h3 class="widget-user-username" th:text="${session.user.name}">张三</h3>
+                    <h5 class="widget-user-desc" th:text="${session.user.signature}">签名...</h5>
+                </div>
+                <div class="box-footer no-padding">
+                    <ul class="nav nav-stacked">
+                        <li><a href="#">会员 <span class="pull-right arrow">></span></a></li>
+                        <li><a href="#">钱包 <span class="pull-right arrow">></span></a></li>
+
+                        <li><a href="#">主题 <span class="pull-right arrow">></span></a></li>
+                        <li><a href="#">相册 <span class="pull-right arrow">></span></a></li>
+                        <li><a href="#">文件 <span class="pull-right arrow">></span></a></li>
+                        <li><a href="#">设置 <span class="pull-right arrow">></span></a></li>
+                        <li id="logout"><a href="#">退出 <span class="pull-right arrow">></span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- /.widget-user -->
+
+
+        </div>
+    </div>
+</div>
+
+
+<script th:inline="none">
+    $(function(){
+
+        var tabOptions={defaultValue:1,lineColor:'#03a9f4',result:function(index){
+                console.log(index);
+            }};
+        $("#tab").tabs(tabOptions);
+
+        $.ajax({
+            url:'getGroupChats',
+            dataType:'json',
+            type:'get',
+            success:function(data){
+                var arr=new Array();
+
+                for(var i=0;i<data.length;i++){
+                  arr.push('<li><a href="toMessageGroupChat/'+data[i].id+'"><img class="direct-chat-img" src="'+data[i].img+'">'+data[i].name+'<span class="pull-right badge bg-blue">'+data[i].count+'</span></a></li>');
+
+                }
+                $("#messageList").append(arr.join(""));
+            }
+        });
+       $.ajax({
+            url:'getGroups',
+            dataType:'json',
+            type:'get',
+            success:function(data){
+                console.log(data);
+                var parentData=data.groups;
+                var childrenData=data.users;
+
+                var options = {
+                    parentData:parentData,
+                    childrenData: childrenData,
+                    expandedAll: false,
+                    parentResult: function(index, expanded, value) {
+                        if (expanded) {
+
+                        } else {
+
+                        }
+                    },
+                    childrenResult: function(pIndex, cIndex, value) {
+                        console.log(pIndex + "--" + cIndex + "--" + value.id);
+                        window.location.href="message/"+value.id;
+                    }
+                };
+                $('.example').Expanded(options);
+
+
+           }
+       });
+
+        $("#logout").click(function(){
+            $.dialog({confirm:true,title:'警告',content:'你确定要退出吗？',result:function(ok){
+                    if(ok){
+                        window.location.href="logout";
+                    }
+                }});
+        });
+
+    })
+</script>
+</body>
+</html>
