@@ -122,6 +122,7 @@
                     <include>**/*.xml</include>
                     <include>**/*.html</include>
                     <include>**/*.sql</include>
+                    <include>**/**</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>
