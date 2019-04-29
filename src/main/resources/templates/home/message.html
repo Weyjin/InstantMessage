@@ -91,7 +91,7 @@
     if ('WebSocket' in window) {
         var currentUserId=$("#currentUser").val();
         var toUserId=$("#toUser").val();
-        websocket = new WebSocket("ws://127.0.0.1:8080/websocket/OneToOne/"+currentUserId+"_"+toUserId+"/"+currentUserId);
+        websocket = new WebSocket("ws://"+window.location.host+"/websocket/OneToOne/"+currentUserId+"_"+toUserId+"/"+currentUserId);
 
         //连接发生错误的回调方法
         websocket.onerror = function () {
