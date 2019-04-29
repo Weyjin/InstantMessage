@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.instant.message.dao.GroupChatDao" >
+
+    <resultMap id="baseResult" type="com.instant.message.entity.GroupChat" >
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+    </resultMap>
+
+
+    <select id="selectByPrimaryKey" parameterType="int" resultMap="baseResult">
+        SELECT gc.id,gc.name,count(cu.id) as `count` FROM `group_chat` as gc left join `chat_users` as cu on
+        cu.chat_id=gc.id
+        where gc.id=#{id}
+    </select>
+
+    <insert id="insert" parameterType="com.instant.message.entity.GroupChat">
+        insert into `group_chat`(name)
+        values(#{name})
+    </insert>
+
+
+    <select id="toList" parameterType="map" resultMap="baseResult">
+        select gc.id,gc.name,count(cu2.`id`) as `count` from  `group_chat` as gc left join `chat_users` as cu on
+        cu.chat_id=gc.`id` and cu.user_id=#{userId}
+        left join `chat_users` as cu2 on cu2.chat_id=cu.chat_id
+        <where>
+            <if test="name!=null">
+                and gc.`name`=#{name}
+            </if>
+        </where>
+        group by gc.`id` having count(cu2.id)>0
+    </select>
+
+    <select id="selectByOnly" parameterType="map" resultMap="baseResult">
+        select gc.id,gc.name,count(cu.id) as `count` from  `group_chat` as gc left join `chat_users` as cu on
+        cu.chat_id=gc.id
+        <where>
+            <if test="name!=null">
+                and `name`=#{name}
+            </if>
+        </where>
+        group by gc.`id` having count(cu.id)>0
+    </select>
+</mapper>

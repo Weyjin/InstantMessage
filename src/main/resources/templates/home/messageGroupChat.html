@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <script th:src="@{/js/jquery-3.2.1.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/AdminLTE.min.css}">
+    <title>群聊</title>
+    <style>
+        html,body{
+            margin:0;
+            height:100%;
+        }
+        .box {
+            height:90%;
+        }
+        .box-body{
+            height:100%;
+        }
+        .direct-chat-messages{
+            height:100%;
+        }
+        .col-md-12{
+            height:100%;
+            padding-right: 0px;
+            padding-left: 0px;
+        }
+    </style>
+</head>
+<body>
+<div class="col-md-12">
+    <input type="text" hidden="hidden" id="currentUser" th:value="${currentUser.id}">
+    <input type="text" hidden="hidden" id="toGroup" th:value="${toGroup}">
+    <!-- DIRECT CHAT SUCCESS -->
+    <div class="box box-success direct-chat direct-chat-success">
+
+        <!-- /.box-header -->
+        <div class="box-body">
+            <!-- Conversations are loaded here -->
+            <div class="direct-chat-messages" id="messages">
+
+
+
+            </div>
+            <!--/.direct-chat-messages-->
+
+            <!-- Contacts are loaded here -->
+            <div class="direct-chat-contacts">
+                <ul class="contacts-list">
+                    <li>
+                        <a href="#">
+                            <img class="contacts-list-img" src="../dist/img/user1-128x128.jpg" alt="User Image">
+
+                            <div class="contacts-list-info">
+                            <span class="contacts-list-name">
+                              Count Dracula
+                              <small class="contacts-list-date pull-right">2/28/2015</small>
+                            </span>
+                                <span class="contacts-list-msg">How have you been? I was...</span>
+                            </div>
+                            <!-- /.contacts-list-info -->
+                        </a>
+                    </li>
+                    <!-- End Contact Item -->
+                </ul>
+                <!-- /.contatcts-list -->
+            </div>
+            <!-- /.direct-chat-pane -->
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer">
+            <form action="#" method="post">
+                <div class="input-group">
+                    <input type="text" name="message" id="message" placeholder="发送消息 ..." class="form-control">
+                    <input id="hiddenText" type="text" style="display:none" />
+                    <span class="input-group-btn">
+                        <button type="button" id="send" class="btn btn-success btn-flat">发送</button>
+                      </span>
+                </div>
+            </form>
+        </div>
+        <!-- /.box-footer-->
+    </div>
+    <!--/.direct-chat -->
+</div>
+<script th:inline="none">
+    var websocket = null;
+    //判断当前浏览器是否支持WebSocket
+    if ('WebSocket' in window) {
+        var currentUserId=$("#currentUser").val();
+        var toGroup=$("#toGroup").val();
+        websocket = new WebSocket("ws://127.0.0.1:8080/websocket/OneToMultiple/_g"+toGroup+"/"+currentUserId);
+
+        //连接发生错误的回调方法
+        websocket.onerror = function () {
+            /*setMessageInnerHTML("WebSocket连接发生错误");*/
+        };
+
+        //连接成功建立的回调方法
+        websocket.onopen = function () {
+            /*setMessageInnerHTML("WebSocket连接成功");*/
+        }
+
+        //接收到消息的回调方法
+        websocket.onmessage = function (event) {
+            var json=JSON.parse(event.data);
+            setMessageInnerHTML(json);
+        }
+
+        //连接关闭的回调方法
+        websocket.onclose = function () {
+            /*setMessageInnerHTML("WebSocket连接关闭");*/
+        }
+
+        //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+        window.onbeforeunload = function () {
+            closeWebSocket();
+        }
+        //将消息显示在网页上
+        function setMessageInnerHTML(data) {
+
+                 if(data.current){
+                     addRightMsg(data);
+                 }else {
+                     addLeftMsg(data);
+                 }
+        }
+
+        //关闭WebSocket连接
+        function closeWebSocket() {
+            websocket.close();
+        }
+
+        $("#send").click(function(){
+            var message=$("#message").val();
+             $("#message").val("");
+            websocket.send(JSON.stringify({'message': message, 'currentUserId': currentUserId, 'toUserId':"_g"+toGroup}));
+
+        });
+
+        Date.prototype.Format = function(fmt)
+        { //author: meizz
+            var o = {
+                "M+" : this.getMonth()+1,                 //月份
+                "d+" : this.getDate(),                    //日
+                "h+" : this.getHours(),                   //小时
+                "m+" : this.getMinutes(),                 //分
+                "s+" : this.getSeconds(),                 //秒
+                "q+" : Math.floor((this.getMonth()+3)/3), //季度
+                "S"  : this.getMilliseconds()             //毫秒
+            };
+            if(/(y+)/.test(fmt))
+                fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+            for(var k in o)
+                if(new RegExp("("+ k +")").test(fmt))
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            return fmt;
+        }
+
+        function addLeftMsg(data){
+            var arr=new Array();
+            arr.push('<div class="direct-chat-msg">');
+            arr.push('<div class="direct-chat-info clearfix">');
+            arr.push('<span class="direct-chat-name pull-left">'+data.user.name+'</span>');
+            arr.push('<span class="direct-chat-timestamp pull-right">'+new Date().Format("yyyy-MM-dd hh:mm:ss")+'</span>');
+            arr.push('</div>');
+            arr.push('<img class="direct-chat-img" src="../images/user2-default.jpg" alt="Message User Image">');
+            arr.push('<div class="direct-chat-text">');
+            arr.push(data.message)
+            arr.push('</div>');
+            arr.push('</div>');
+            $("#messages").append(arr.join(""))
+        }
+        function addRightMsg(data) {
+            var arr=new Array();
+            arr.push('<div class="direct-chat-msg right">');
+            arr.push('<div class="direct-chat-info clearfix">');
+            arr.push('<span class="direct-chat-name pull-right">'+data.user.name+'</span>');
+            arr.push('<span class="direct-chat-timestamp pull-left">'+new Date().Format("yyyy-MM-dd hh:mm:ss")+'</span>');
+            arr.push('</div>');
+            arr.push('<img class="direct-chat-img" src="../images/user4-default.jpg" alt="Message User Image">');
+            arr.push('<div class="direct-chat-text">');
+               arr.push(data.message)
+                arr.push('</div>');
+            arr.push('</div>');
+
+            $("#messages").append(arr.join(""))
+        }
+
+
+    }
+    else {
+        console.log('当前浏览器 Not support websocket')
+    }
+
+
+</script>
+
+</body>
+</html>
