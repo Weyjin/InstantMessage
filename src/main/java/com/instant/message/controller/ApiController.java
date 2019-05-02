@@ -55,7 +55,7 @@ public class ApiController {
         return groupChats;
     }
 
-    @RequestMapping("login")
+    @RequestMapping(value = "login",method = RequestMethod.POST)
     @ResponseBody
     public Map<String,Object> login(String name,String password){
         Map<String,Object> map=new HashMap<>();
@@ -66,9 +66,15 @@ public class ApiController {
 
          map=new HashMap<>();
         if(user==null){
-            map.put("msg","账户出错");
+            map.put("msg","error");
+            map.put("userName","");
+            map.put("userId","");
+            map.put("signature","");
         }else {
-            map.put("msg","成功");
+            map.put("msg","success");
+            map.put("userName",user.getName());
+            map.put("userId",user.getId());
+            map.put("signature",user.getSignature());
         }
         return map;
     }

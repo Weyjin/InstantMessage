@@ -104,7 +104,7 @@ public class WebSocketOneToMultipleOnLine {
         Set<WebSocketOneToMultipleOnLine> toGroups=connections.get(groupId);
         if(toGroups!=null){
 
-
+            //TODO:有时会发生同一个组里别人收到，而自己收不到的情况
             for(WebSocketOneToMultipleOnLine w:toGroups){
                 if(w.id.equals(currentUserId)){
                     message.setCurrent(true);
@@ -114,8 +114,12 @@ public class WebSocketOneToMultipleOnLine {
                 String json=JSON.toJSONString(message);
                 if(w.session.isOpen()){
                     w.session.getBasicRemote().sendText(json);
+                    System.out.println("当前连接已打开:" + json);
+
                 }else {
                     connections.get(groupId).remove(w.id);
+                    System.out.println("当前连接已关闭:"+json);
+
                 }
 
             }
