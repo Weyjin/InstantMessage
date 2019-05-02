@@ -46,6 +46,8 @@ public class ShiroConfiguration {
         map.put("**/login**","anon");
 
         map.put("**/statics/**","anon");
+        map.put("**/websocket/**","anon");
+        map.put("**/api/**","anon");
         map.put("/logout","anon");
         //对所有用户认证
         map.put("/***","authc");
