@@ -80,6 +80,7 @@ public class WebSocketOneToOneOnLine {
     }
 
     private  static void sendMessage(String currentUserSocketId,String toUserSocketId,OneToOneMessage message) throws IOException {
+        System.out.println("开始发消息...");
 
         WebSocketOneToOneOnLine currentUser=connections.get(currentUserSocketId);
         if(currentUser!=null){
@@ -87,6 +88,8 @@ public class WebSocketOneToOneOnLine {
             String json=JSON.toJSONString(message);
             if(currentUser.session.isOpen()) {
                 currentUser.session.getBasicRemote().sendText(json);
+                System.out.println("发送消息给自己:" + json);
+
             }else {
                 connections.remove(currentUserSocketId);
             }
@@ -98,12 +101,15 @@ public class WebSocketOneToOneOnLine {
             String json=JSON.toJSONString(message);
             if(toUser.session.isOpen()){
                 toUser.session.getBasicRemote().sendText(json);
+                System.out.println("发送消息给对方:" + json);
+
             }else {
                 connections.remove(toUserSocketId);
             }
 
 
         }
+        System.out.println("发完消息...");
 
     }
 
