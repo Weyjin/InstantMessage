@@ -5,7 +5,6 @@ import com.instant.message.config.ApplicationHelper;
 import com.instant.message.entity.OneToOneMessage;
 import com.instant.message.entity.Result;
 import com.instant.message.service.UserService;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;

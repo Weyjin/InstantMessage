@@ -18,3 +18,8 @@ CREATE TABLE `chat_users`(
     chat_id int(20),
     user_id int(20)
 );
+CREATE TABLE `login_token`(
+       id int(20) not null primary key AUTO_INCREMENT,
+       token char(64),
+       user_id int(20)
+);
